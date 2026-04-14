@@ -1,0 +1,52 @@
+// OpenClaw — configuration with Telegram channel
+// Replace placeholder values with your specifics.
+// All secrets must be environment variables. Never hardcode keys.
+{
+  // Model provider
+  agents: {
+    defaults: {
+      model: {
+        // Replace with your chosen provider/model
+        primary: "anthropic/claude-sonnet-4-5",
+      },
+      // Workspace directory where SOUL.md lives
+      workspace: "~/.openclaw/workspace",
+    },
+  },
+
+  // Telegram channel
+  channels: {
+    telegram: {
+      enabled: true,
+      token: "${TELEGRAM_BOT_TOKEN}",
+
+      // Access control:
+      //   "open"      — anyone can message the bot (POC only, not for production)
+      //   "allowlist" — only listed usernames can message (recommended)
+      //   "closed"    — bot accepts no new conversations
+      dmPolicy: "allowlist",
+
+      // Telegram usernames to allow (must start with @)
+      // Only used when dmPolicy is "allowlist"
+      allowlist: [
+        "@yourusername",
+      ],
+
+      // Route to a specific agent (optional, default: "main")
+      agentId: "main",
+    },
+  },
+
+  // Gateway — keep on loopback, use SSH tunnel or Tailscale for remote access
+  gateway: {
+    listen: "127.0.0.1:18789",
+    auth: {
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  // Hooks disabled — enable when connecting n8n
+  hooks: {
+    enabled: false,
+  },
+}

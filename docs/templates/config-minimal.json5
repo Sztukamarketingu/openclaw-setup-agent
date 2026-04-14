@@ -1,0 +1,32 @@
+// OpenClaw — minimal configuration (no channels, no hooks)
+// Use this as a base when testing locally or before adding channels.
+// All secrets must be environment variables. Never hardcode keys.
+{
+  // Model provider
+  agents: {
+    defaults: {
+      model: {
+        // Options:
+        //   anthropic/claude-sonnet-4-5     (requires ANTHROPIC_API_KEY)
+        //   anthropic/claude-opus-4-6       (more capable, higher cost)
+        //   openai/gpt-4o                   (requires OPENAI_API_KEY)
+        //   openrouter/anthropic/claude-3.5-sonnet  (requires OPENROUTER_API_KEY)
+        //   nexos/<model-id>                (requires NEXOS_API_KEY + custom provider block)
+        primary: "anthropic/claude-sonnet-4-5",
+      },
+    },
+  },
+
+  // Gateway — keep on loopback, use SSH tunnel for remote access
+  gateway: {
+    listen: "127.0.0.1:18789",
+    auth: {
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  // Hooks disabled in minimal config
+  hooks: {
+    enabled: false,
+  },
+}

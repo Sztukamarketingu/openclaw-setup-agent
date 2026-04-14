@@ -1,0 +1,17 @@
+# Credentials — never commit
+.env
+
+# Generated output — user-specific, not for version control
+output/*
+!output/.gitkeep
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Editor
+.vscode/
+.idea/
+*.swp

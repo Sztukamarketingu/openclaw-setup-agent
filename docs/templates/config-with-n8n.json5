@@ -1,0 +1,74 @@
+// OpenClaw — configuration with Telegram + n8n webhook integration
+// Replace placeholder values with your specifics.
+// All secrets must be environment variables. Never hardcode keys.
+{
+  // Model provider
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-sonnet-4-5",
+      },
+      workspace: "~/.openclaw/workspace",
+    },
+
+    // Optional: define multiple agents for different roles
+    // Uncomment and modify if you need more than one agent
+    // list: [
+    //   {
+    //     id: "main",
+    //     name: "Main Assistant",
+    //     model: { primary: "anthropic/claude-sonnet-4-5" },
+    //     workspace: "~/.openclaw/workspace",
+    //   },
+    //   {
+    //     id: "drafts",
+    //     name: "Document Drafter",
+    //     model: { primary: "anthropic/claude-opus-4-6" },
+    //     workspace: "~/.openclaw/workspace-drafts",
+    //   },
+    // ],
+  },
+
+  // Telegram channel
+  channels: {
+    telegram: {
+      enabled: true,
+      token: "${TELEGRAM_BOT_TOKEN}",
+      dmPolicy: "allowlist",
+      allowlist: [
+        "@yourusername",
+      ],
+      agentId: "main",
+    },
+  },
+
+  // Gateway
+  gateway: {
+    listen: "127.0.0.1:18789",
+    auth: {
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  // Webhooks — enabled for n8n integration
+  // n8n calls POST /hooks/agent with Authorization: Bearer {OPENCLAW_HOOKS_TOKEN}
+  // IMPORTANT: hooks token must be different from gateway token
+  hooks: {
+    enabled: true,
+    token: "${OPENCLAW_HOOKS_TOKEN}",
+    path: "/hooks",
+
+    // Default session key for n8n-triggered requests
+    defaultSessionKey: "hook:n8n:ingress",
+
+    // Security: disallow callers from setting their own session key
+    allowRequestSessionKey: false,
+
+    // Only allow session keys with these prefixes
+    allowedSessionKeyPrefixes: ["hook:"],
+
+    // Restrict which agents can be triggered via hooks
+    // Must match agent IDs defined in agents.list (or "main" if using defaults)
+    allowedAgentIds: ["main"],
+  },
+}
