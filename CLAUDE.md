@@ -27,7 +27,11 @@ Look for `.env` in the current directory.
 
 **If it does not exist:** guide the user through creating it step by step:
 
-1. Tell them to run: `cp .env.example .env`
+1. Tell them to run this command in their terminal:
+   ```
+   cp .env.example .env
+   ```
+   Explain: "This creates your credentials file from the template. Open `.env` in any text editor — we'll fill it in together."
 2. Then go through each REQUIRED field one by one. For each field, explain:
    - what it is in plain language
    - exactly where to get it

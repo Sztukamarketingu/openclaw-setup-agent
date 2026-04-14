@@ -18,12 +18,18 @@ A Claude Code agent that guides you through configuring OpenClaw on a Hostinger 
 ```bash
 git clone https://github.com/Sztukamarketingu/openclaw-setup-agent
 cd openclaw-setup-agent
-cp .env.example .env
-# Fill in .env with your credentials (see below)
-claude
+claude "Start OpenClaw setup"
 ```
 
-The agent starts automatically and guides you through the rest.
+The agent starts, walks you through creating `.env`, asks about your business, and guides you through the rest.
+
+**Returning to a previous session:**
+```bash
+cd openclaw-setup-agent
+claude "Continue setup"
+```
+
+The agent reads `output/SETUP_PROGRESS.md` and resumes exactly where you left off.
 
 ---
 
