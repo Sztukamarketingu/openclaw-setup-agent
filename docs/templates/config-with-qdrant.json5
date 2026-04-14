@@ -1,0 +1,85 @@
+// OpenClaw — configuration with Qdrant for semantic memory and RAG
+// File location: /data/.openclaw/openclaw.json  (Docker/VPS setup)
+//
+// Qdrant is a vector database for semantic search over documents, emails,
+// product catalogs, knowledge bases — anything you embed and store.
+//
+// Architecture:
+//   User message → agent → Qdrant search → relevant context → LLM response
+//   n8n → embed new document → Qdrant upsert
+//
+// This config assumes Qdrant runs on the same VPS as OpenClaw (recommended for POC).
+// For production: run Qdrant as a separate service or use Qdrant Cloud.
+//
+// All secrets must be environment variable references. Never hardcode keys.
+{
+  // Model provider
+  agents: {
+    defaults: {
+      model: {
+        primary: "anthropic/claude-sonnet-4-5",
+      },
+      workspace: "/data/.openclaw/workspace",
+
+      // Tools — enable RAG search tool
+      tools: {
+        allow: [
+          // Standard tools
+          "read_file",
+          "write_file",
+          "search_memory",
+          // RAG / Qdrant tool — exact name depends on OpenClaw version
+          // Check: openclaw tools list
+          "qdrant_search",
+        ],
+      },
+    },
+  },
+
+  // Vector store configuration
+  // Qdrant running locally on same VPS:
+  vectorStore: {
+    provider: "qdrant",
+    qdrant: {
+      url: "${QDRANT_URL}",         // e.g. http://127.0.0.1:6333
+      apiKey: "${QDRANT_API_KEY}",  // leave empty string "" if no auth (local dev)
+      collection: "openclaw",       // collection name — create it before first use
+    },
+  },
+
+  // Telegram channel
+  channels: {
+    telegram: {
+      enabled: true,
+      botToken: "${TELEGRAM_BOT_TOKEN}",
+      dmPolicy: "allowlist",
+      allowFrom: [
+        123456789,   // Replace with your numeric Telegram user ID
+      ],
+      groups: {
+        "*": {
+          enabled: false,
+        },
+      },
+    },
+  },
+
+  // Gateway
+  gateway: {
+    listen: "127.0.0.1:18789",
+    auth: {
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  // Hooks — enable for n8n to trigger RAG indexing and agent queries
+  hooks: {
+    enabled: true,
+    token: "${OPENCLAW_HOOKS_TOKEN}",
+    path: "/hooks",
+    defaultSessionKey: "hook:n8n:ingress",
+    allowRequestSessionKey: false,
+    allowedSessionKeyPrefixes: ["hook:"],
+    allowedAgentIds: ["main"],
+  },
+}

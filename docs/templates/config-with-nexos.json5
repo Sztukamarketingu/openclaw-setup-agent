@@ -1,0 +1,97 @@
+// OpenClaw — configuration with Nexos AI Gateway as model provider
+// File location: /data/.openclaw/openclaw.json  (Docker/VPS setup)
+//
+// Nexos routes requests to multiple LLM providers through a single endpoint.
+// Use this when you want centralized cost tracking, budget limits, or
+// multi-model routing through one API key.
+//
+// Before using this template:
+// 1. Confirm your Nexos base URL from the Nexos console
+// 2. Confirm exact model IDs as Nexos exposes them (may differ from provider-native IDs)
+// 3. Test the endpoint with curl before configuring OpenClaw (see docs/knowledge/nexos-integration.md)
+//
+// All secrets must be environment variable references. Never hardcode keys.
+{
+  // Custom model provider — Nexos via OpenAI-compatible API
+  models: {
+    providers: {
+      nexos: {
+        // Base URL from your Nexos console — typically ends in /v1
+        baseUrl: "${NEXOS_BASE_URL}",
+        apiKey: "${NEXOS_API_KEY}",
+
+        // OpenAI-compatible completions API
+        api: "openai-completions",
+
+        // List models EXACTLY as Nexos exposes them.
+        // Get the list from your Nexos dashboard or /v1/models endpoint.
+        // The id here must match what Nexos accepts, not the provider-native name.
+        models: [
+          {
+            id: "claude-sonnet-4-5",
+            name: "Claude Sonnet via Nexos",
+            contextWindow: 200000,
+            maxTokens: 8096,
+          },
+          {
+            id: "claude-opus-4-6",
+            name: "Claude Opus via Nexos",
+            contextWindow: 200000,
+            maxTokens: 8096,
+          },
+          // Add more models as available in your Nexos plan:
+          // { id: "gpt-4o", name: "GPT-4o via Nexos" },
+          // { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro via Nexos" },
+        ],
+
+        // Uncomment if Nexos does not support the developer role message:
+        // compat: {
+        //   supportsDeveloperRole: false,
+        // },
+      },
+    },
+  },
+
+  // Agent model — reference as "nexos/<model-id>" where model-id matches models[].id above
+  agents: {
+    defaults: {
+      model: {
+        primary: "nexos/claude-sonnet-4-5",
+        // Cross-provider fallback if Nexos is unreachable:
+        // fallback: ["anthropic/claude-sonnet-4-5"],
+      },
+      workspace: "/data/.openclaw/workspace",
+    },
+  },
+
+  // Telegram channel
+  channels: {
+    telegram: {
+      enabled: true,
+      botToken: "${TELEGRAM_BOT_TOKEN}",
+      dmPolicy: "allowlist",
+      allowFrom: [
+        123456789,   // Replace with your numeric Telegram user ID
+      ],
+      groups: {
+        "*": {
+          enabled: false,
+        },
+      },
+    },
+  },
+
+  // Gateway
+  gateway: {
+    listen: "127.0.0.1:18789",
+    auth: {
+      token: "${OPENCLAW_GATEWAY_TOKEN}",
+    },
+  },
+
+  // Hooks — enable if connecting n8n
+  hooks: {
+    enabled: false,
+    token: "${OPENCLAW_HOOKS_TOKEN}",
+  },
+}

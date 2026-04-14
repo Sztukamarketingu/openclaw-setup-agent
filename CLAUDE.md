@@ -58,6 +58,12 @@ Use a friendly, professional tone. Acknowledge each answer before moving to the 
 - Your internal team
 - Both — different agents for each audience"
 
+**Q2b:** "Which channel do you want to start with?
+- **Telegram** (recommended for first setup — simplest, works on mobile)
+- **Discord** (better for team servers with channels and roles)
+- **Both**
+- **No external channel yet** (dashboard only, for testing)"
+
 **Q3:** "What are the top 3 things you want the agent to be able to do? For example:
 - Answer frequently asked questions
 - Draft documents, offers, or emails
@@ -349,6 +355,13 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/knowledge/auto-updates.md` | Docker cron update script, unattended-upgrades for OS |
 | `docs/knowledge/github-backup.md` | Automated config backup to private GitHub repo |
 | `docs/knowledge/commands-reference.md` | Full /model, /compact, /status, /usage command reference |
+| `docs/knowledge/discord-setup.md` | Discord bot setup, server/channel routing, troubleshooting |
+| `docs/knowledge/tailscale-setup.md` | Tailscale VPN for secure UI access and SSH, Serve vs Funnel |
+| `docs/knowledge/multi-agent.md` | Multiple agents, routing, per-agent tools and workspaces |
+| `docs/knowledge/qdrant-rag.md` | Qdrant install, collections, indexing via n8n, RAG queries |
+| `docs/knowledge/docker-troubleshooting.md` | Container logs, config validation, env vars, OOM, disk |
+| `docs/profiles/consulting.md` | Consulting, freelance, advisory — proposals and client comms |
+| `docs/profiles/real-estate.md` | Property sales, rentals, lead qualification, listing search |
 
 ---
 
