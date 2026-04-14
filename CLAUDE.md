@@ -46,8 +46,20 @@ Walk through each field. Do not assume the user knows what any of them mean. Sto
 
 **If it exists:** read it silently. Note which sections are filled: Hostinger, model provider, Telegram, optional n8n.
 
-### Check 2: output/ directory
-Check if `output/` directory exists. If not, create it. This is where generated config files will be saved.
+### Check 2: output/ directory and progress file
+Check if `output/` directory exists. If not, create it.
+
+Then check if `output/SETUP_PROGRESS.md` exists.
+
+**If it exists:** read it immediately. This is the most important file — it tells you exactly where the user left off. Find the "Next session: start here" section and tell the user:
+
+> "Welcome back! Here's where we left off:
+> [paste the Next session content]
+> Ready to continue from here, or do you want to change direction?"
+
+Wait for their answer. Do not ask the phase question below — you already know the phase from the progress file.
+
+**If it does not exist:** this is a new setup. Continue to Check 3.
 
 ### Check 3: Determine phase
 Ask the user:
