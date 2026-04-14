@@ -291,14 +291,35 @@ After deployment, run through this checklist with the user:
 
 Print the checklist and mark each item as the user confirms it.
 
-When all items are checked, congratulate the user and offer next steps:
+When all items are checked, congratulate the user and offer next steps in this recommended order:
 
-> "Setup complete! Here are some things you can do next:
-> - Add more knowledge to the agent (upload documents to workspace)
-> - Configure a second channel (Discord, SMS)
-> - Connect n8n workflows (see docs/knowledge/n8n-integration.md)
-> - Add a second specialized agent for a different audience
-> - Set up Qdrant for semantic memory and RAG"
+> "Setup complete! Here's what to do next — in order of priority:
+>
+> **1. Agent onboarding** (do this first — most impactful)
+> Run `/model Opus` then send: "Run a thorough onboarding process with me."
+> The agent learns who you are and saves it to memory for all future sessions.
+> See: `docs/knowledge/memory-management.md`
+>
+> **2. Add models** (Anthropic + OpenRouter for flexibility and fallbacks)
+> See: `docs/knowledge/models-configuration.md`
+>
+> **3. Enable web search** (Perplexity via OpenRouter — ~$3/1000 queries)
+> See: `docs/knowledge/web-search.md`
+>
+> **4. Enable memory features** (Memory Flush + Session Memory Search)
+> See: `docs/knowledge/memory-management.md`
+>
+> **5. Auto-updates** (Docker cron + unattended-upgrades for OS)
+> See: `docs/knowledge/auto-updates.md`
+>
+> **6. GitHub backup** (separate agent account, private repo, daily cron)
+> See: `docs/knowledge/github-backup.md`
+>
+> **Later (when base setup is stable):**
+> - Connect n8n workflows → `docs/knowledge/n8n-integration.md`
+> - Browser automation for panels without API → `docs/knowledge/browser-automation.md`
+> - Second channel (Discord, SMS)
+> - Qdrant for semantic memory and RAG"
 
 ---
 
@@ -322,6 +343,12 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/prompts/security-audit.md` | Security review of generated config (PoLP audit) |
 | `docs/prompts/execution-rules.md` | Failure handling rules for deployment and automation |
 | `docs/prompts/cost-optimization.md` | Reducing VPS and LLM costs after setup |
+| `docs/knowledge/models-configuration.md` | Adding Anthropic + OpenRouter models, aliases, fallbacks |
+| `docs/knowledge/web-search.md` | Perplexity/sonar-pro via OpenRouter |
+| `docs/knowledge/memory-management.md` | Memory Flush, Session Memory Search, onboarding with Opus |
+| `docs/knowledge/auto-updates.md` | Docker cron update script, unattended-upgrades for OS |
+| `docs/knowledge/github-backup.md` | Automated config backup to private GitHub repo |
+| `docs/knowledge/commands-reference.md` | Full /model, /compact, /status, /usage command reference |
 
 ---
 

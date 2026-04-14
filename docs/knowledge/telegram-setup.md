@@ -17,15 +17,34 @@
 
 You need your numeric Telegram user ID to restrict access. Without an allowlist, **anyone who finds your bot's username can send it commands — including commands that execute on your server.**
 
-**How to get your numeric user ID:**
+**Easiest method — @userinfobot:**
+1. Open Telegram and search for **@userinfobot**
+2. Send it any message
+3. It replies with your user ID (e.g. `123456789`)
+4. Save this number — it goes into `allowFrom` in the config
+
+**Alternative method — getUpdates API:**
 1. Send any message to your bot
 2. Open in browser: `https://api.telegram.org/bot{YOUR_TOKEN}/getUpdates`
 3. Find `"from": {"id": 123456789}` — that number is your user ID
-4. Save it — you will put it in `allowFrom` in the config
 
 ---
 
-## Step 3: Configure Telegram in openclaw.json
+## Step 3: Add bot token to Hostinger Environment
+
+In Hostinger panel → VPS → **Environment** section, add:
+
+```
+TELEGRAM_BOT_TOKEN=YOUR_TOKEN_FROM_BOTFATHER
+```
+
+Click **Deploy** — the container will pick up the new variable.
+
+> Never paste the token directly in `openclaw.json`. Use `"${TELEGRAM_BOT_TOKEN}"` — OpenClaw substitutes the value from the environment variable automatically. A hardcoded token can leak through backups, screenshots, or prompt injection.
+
+---
+
+## Step 4: Configure Telegram in openclaw.json
 
 OpenClaw reads its config from `/data/.openclaw/openclaw.json` (Docker/VPS setup).
 
@@ -60,7 +79,7 @@ OpenClaw reads its config from `/data/.openclaw/openclaw.json` (Docker/VPS setup
 
 ---
 
-## Step 4: Apply config via OpenClaw dashboard
+## Step 5: Apply config via OpenClaw dashboard
 
 The recommended way to apply this config is through the OpenClaw Control UI (accessible via Tailscale or SSH tunnel):
 
@@ -92,7 +111,7 @@ ssh -i "${VPS_SSH_KEY_PATH}" "${VPS_USERNAME}@${VPS_HOSTNAME}" \
 
 ---
 
-## Step 5: Verify the connection
+## Step 6: Verify the connection
 
 Send "hello" to your bot in Telegram. You should receive a response within a few seconds.
 
