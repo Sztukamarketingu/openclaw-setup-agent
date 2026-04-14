@@ -125,15 +125,20 @@ Use a friendly, professional tone. Acknowledge each answer before moving to the 
 - Warm and supportive
 - Other (describe)"
 
-**Q7:** "Are you using n8n for workflow automation? If yes — do you want to connect it to OpenClaw so n8n can trigger the agent for tasks like drafting documents or sending notifications?"
+**Q7:** "Czy używasz n8n do automatyzacji? Jeśli tak — co chcesz żebym zrobił:
+- **A) Tylko strona OpenClaw** — skonfiguruję hooki i tokeny w OpenClaw, żeby n8n mógł wyzwalać agenta. Workflow w n8n budujesz sam.
+- **B) OpenClaw + workflow w n8n** — skonfiguruję hooki OpenClaw ORAZ zbuduję gotowe workflow bezpośrednio w Twoim n8n. Do tego potrzebuję adresu n8n i klucza API — dodam je do .env jako opcjonalne pola.
+- **C) Nie używam n8n** — pomijamy integrację.
+
+Jeśli wybierzesz B: po discovery poproszę o N8N_BASE_URL i N8N_API_KEY do .env."
 
 **Q8:** "Do you need the agent to automate any web interfaces — for example, a booking panel, CRM, ticketing system, or admin portal that has no public API? The agent can control a browser to fill forms, click buttons, and extract data from such panels."
 
-**Q9:** "Which model provider do you want to use?
-- **Anthropic Claude** (recommended — best reasoning, required: ANTHROPIC_API_KEY in .env)
-- **OpenAI** (required: OPENAI_API_KEY in .env)
-- **Nexos gateway** (recommended for cost control — routes to multiple models, required: NEXOS_API_KEY + NEXOS_BASE_URL in .env)
-- **OpenRouter** (access to many models — required: OPENROUTER_API_KEY in .env)"
+**Q9:** "Jakiego dostawcę modelu chcesz użyć?
+- **Anthropic Claude** (zalecany — najlepsze rozumowanie; klucz ANTHROPIC_API_KEY ustawimy w Hostinger Environment Variables)
+- **OpenAI** (klucz OPENAI_API_KEY ustawimy w Hostinger Environment Variables)
+- **Nexos gateway** (zalecany przy większym ruchu — routing do wielu modeli, kontrola kosztów; NEXOS_API_KEY + NEXOS_BASE_URL ustawimy w Hostinger Environment Variables)
+- **OpenRouter** (dostęp do wielu modeli: Gemini, DeepSeek, GPT; OPENROUTER_API_KEY ustawimy w Hostinger Environment Variables)"
 
 ### After all questions: summarize
 
@@ -146,7 +151,7 @@ Top capabilities: [list]
 Knowledge available: [list]
 Restrictions: [list]
 Agent name & tone: [name + tone]
-n8n integration: [yes / no]
+n8n integration: [nie / tylko hooki OpenClaw / hooki + workflow w n8n]
 Browser automation: [yes / no — which systems]
 Model provider: [choice]
 ```

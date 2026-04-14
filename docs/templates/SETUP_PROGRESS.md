@@ -16,7 +16,7 @@
 | **Tone** | _[professional / friendly / concise / formal]_ |
 | **Primary channel** | _[Telegram / Discord / none]_ |
 | **Model provider** | _[Anthropic / OpenAI / Nexos / OpenRouter]_ |
-| **n8n integration** | _[yes / no]_ |
+| **n8n integration** | _[nie / tylko hooki OpenClaw / hooki + workflow w n8n]_ |
 | **Browser automation** | _[yes — which systems / no]_ |
 | **Setup path** | _[A: Minimal POC / B: POC + Nexos / C: POC + n8n automation]_ |
 
@@ -52,7 +52,7 @@ Phases: `Discovery` → `Config Design` → `Deployment` → `Verification` → 
 
 ### Phase 3: Deployment
 - [ ] VPS identified via Hostinger API
-- [ ] Environment variables set on VPS
+- [ ] Environment variables set in Hostinger panel
 - [ ] `config.json5` uploaded to VPS
 - [ ] `SOUL.md` uploaded to VPS
 - [ ] OpenClaw Gateway restarted
