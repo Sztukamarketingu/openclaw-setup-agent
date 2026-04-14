@@ -24,8 +24,27 @@ At the start of every session, run these three checks before anything else:
 
 ### Check 1: .env file
 Look for `.env` in the current directory.
-- If it does not exist: tell the user to run `cp .env.example .env` and fill in the required credentials. Show them which fields are mandatory (marked `REQUIRED` in `.env.example`). Stop and wait.
-- If it exists: read it silently. Note which sections are filled: Hostinger, model provider, Telegram, optional n8n.
+
+**If it does not exist:** guide the user through creating it step by step:
+
+1. Tell them to run: `cp .env.example .env`
+2. Then go through each REQUIRED field one by one. For each field, explain:
+   - what it is in plain language
+   - exactly where to get it
+   - if they need to generate it, give them the exact command
+
+For the security tokens specifically, explain it like this:
+> "Two of the fields — `OPENCLAW_GATEWAY_TOKEN` and `OPENCLAW_HOOKS_TOKEN` — are passwords you generate yourself. Run this command twice in your terminal, and use each result for one field:
+> ```
+> openssl rand -hex 32
+> ```
+> The first output goes into `OPENCLAW_GATEWAY_TOKEN` (this protects your OpenClaw dashboard).
+> The second goes into `OPENCLAW_HOOKS_TOKEN` (this is the password n8n uses to send tasks to your agent).
+> They must be different values."
+
+Walk through each field. Do not assume the user knows what any of them mean. Stop and wait after each group of related fields before moving on.
+
+**If it exists:** read it silently. Note which sections are filled: Hostinger, model provider, Telegram, optional n8n.
 
 ### Check 2: output/ directory
 Check if `output/` directory exists. If not, create it. This is where generated config files will be saved.
