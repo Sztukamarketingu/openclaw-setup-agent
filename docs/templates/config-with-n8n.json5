@@ -33,11 +33,25 @@
   channels: {
     telegram: {
       enabled: true,
-      token: "${TELEGRAM_BOT_TOKEN}",
+
+      // Always use env var reference — never paste the raw token here
+      botToken: "${TELEGRAM_BOT_TOKEN}",
+
       dmPolicy: "allowlist",
-      allowlist: [
-        "@yourusername",
+
+      // Numeric Telegram user IDs (not @usernames).
+      // Get yours: https://api.telegram.org/bot{TOKEN}/getUpdates → "from.id"
+      allowFrom: [
+        123456789,   // Replace with your actual numeric user ID
       ],
+
+      // Disable bot in all group chats
+      groups: {
+        "*": {
+          enabled: false,
+        },
+      },
+
       agentId: "main",
     },
   },

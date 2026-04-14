@@ -153,6 +153,14 @@ Provider mapping:
 - Nexos → custom `models.providers.nexos` block (see `docs/knowledge/nexos-integration.md`)
 - OpenRouter → `"openrouter/anthropic/claude-3.5-sonnet"`
 
+Telegram field names in `openclaw.json`:
+- Token field: `"botToken"` (not `"token"`)
+- Allowlist field: `"allowFrom": [numeric_id]` (numeric user IDs, not @usernames)
+- Always add: `"groups": { "*": { "enabled": false } }` to disable group chats
+- Config file reloads automatically — no Gateway restart needed after editing `openclaw.json`
+- Config path for Docker/VPS: `/data/.openclaw/openclaw.json`
+- See `docs/knowledge/telegram-setup.md` for full reference and how to get the user's numeric ID
+
 ### 2c. Generate output/env-vars.txt
 
 List of environment variables that need to be set on the VPS. Format:

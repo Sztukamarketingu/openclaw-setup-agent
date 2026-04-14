@@ -13,105 +13,156 @@
 
 ---
 
-## Step 2: Find your Telegram chat ID (for allowlist setup)
+## Step 2: Find your Telegram user ID (required for allowlist)
 
-To restrict who can use the bot, you need Telegram user IDs or usernames.
+You need your numeric Telegram user ID to restrict access. Without an allowlist, **anyone who finds your bot's username can send it commands — including commands that execute on your server.**
 
-**Get your username:**
-Telegram → Settings → Username (e.g. `@yourname`)
-
-**Get a numeric chat ID:**
-1. Send a message to your bot
-2. Open: `https://api.telegram.org/bot{TOKEN}/getUpdates`
-3. Find `"from": {"id": 123456789}` — that's the user ID
+**How to get your numeric user ID:**
+1. Send any message to your bot
+2. Open in browser: `https://api.telegram.org/bot{YOUR_TOKEN}/getUpdates`
+3. Find `"from": {"id": 123456789}` — that number is your user ID
+4. Save it — you will put it in `allowFrom` in the config
 
 ---
 
-## Step 3: Configure Telegram in OpenClaw config
+## Step 3: Configure Telegram in openclaw.json
 
-### Open bot (anyone can message — POC only)
+OpenClaw reads its config from `/data/.openclaw/openclaw.json` (Docker/VPS setup).
 
-```json5
-channels: {
-  telegram: {
-    enabled: true,
-    token: "${TELEGRAM_BOT_TOKEN}",
-    dmPolicy: "open",
-  },
-},
+**Add the `channels` section to your `openclaw.json`:**
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "dmPolicy": "allowlist",
+      "allowFrom": [YOUR_NUMERIC_USER_ID],
+      "groups": {
+        "*": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}
 ```
 
-### Allowlist (recommended for production)
+**Replace `YOUR_NUMERIC_USER_ID`** with your actual numeric ID from Step 2 (e.g. `123456789`).
 
-```json5
-channels: {
-  telegram: {
-    enabled: true,
-    token: "${TELEGRAM_BOT_TOKEN}",
-    dmPolicy: "allowlist",
-    allowlist: ["@yourusername", "@colleague"],
-  },
-},
+### Key points
+
+- Use `"${TELEGRAM_BOT_TOKEN}"` — OpenClaw substitutes the value from the environment variable automatically. **Never paste the token directly in the JSON file.** A hardcoded token can leak through backups, screenshots, or prompt injection.
+- `dmPolicy: "allowlist"` + `allowFrom` = only listed user IDs can interact with the bot
+- `groups: { "*": { enabled: false } }` — disables all group chats; the bot only responds in direct messages
+- **OpenClaw detects config file changes automatically — no container or Gateway restart required**
+
+---
+
+## Step 4: Apply config via OpenClaw dashboard
+
+The recommended way to apply this config is through the OpenClaw Control UI (accessible via Tailscale or SSH tunnel):
+
+1. Open the OpenClaw dashboard
+2. Send the agent this command:
+
+```
+Add to /data/.openclaw/openclaw.json a channels section with this Telegram configuration:
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "dmPolicy": "allowlist",
+      "allowFrom": [YOUR_NUMERIC_USER_ID],
+      "groups": { "*": { "enabled": false } }
+    }
+  }
+}
 ```
 
-### Route to specific agent
+Or edit the file directly via SSH:
 
-```json5
-channels: {
-  telegram: {
-    enabled: true,
-    token: "${TELEGRAM_BOT_TOKEN}",
-    dmPolicy: "allowlist",
-    allowlist: ["@yourusername"],
-    agentId: "main",                 // Which agent handles Telegram messages
-  },
-},
+```bash
+ssh -i "${VPS_SSH_KEY_PATH}" "${VPS_USERNAME}@${VPS_HOSTNAME}" \
+  "cat /data/.openclaw/openclaw.json"
+# Read current file, then update it with the channels section
 ```
 
 ---
 
-## Step 4: Test the connection
+## Step 5: Verify the connection
 
-After deploying config and restarting Gateway:
+Send "hello" to your bot in Telegram. You should receive a response within a few seconds.
+
+To check channel status via CLI:
 
 ```bash
 openclaw channels status --probe
 ```
 
-Expected output for a working channel:
+Expected output:
 ```
 telegram: connected (bot: @your_bot_name)
 ```
 
-Then send "hello" to your bot in Telegram. The agent should reply within a few seconds.
+---
+
+## Config file format reference
+
+### openclaw.json field names for Telegram
+
+| Field | Value | Notes |
+|-------|-------|-------|
+| `enabled` | `true` / `false` | Activates the channel |
+| `botToken` | `"${TELEGRAM_BOT_TOKEN}"` | Always use env var reference, never the raw token |
+| `dmPolicy` | `"allowlist"` / `"open"` / `"closed"` | Use `"allowlist"` for any real deployment |
+| `allowFrom` | `[123456789, 987654321]` | Numeric Telegram user IDs |
+| `groups["*"].enabled` | `false` | Disables bot in all group chats |
+| `agentId` | `"main"` | Routes to a specific agent (optional) |
+
+### Security levels
+
+| dmPolicy | Who can message | Use case |
+|----------|----------------|----------|
+| `"open"` | Anyone | Never use in production |
+| `"allowlist"` | Only listed user IDs | Recommended for all real deployments |
+| `"closed"` | Nobody (bot inactive) | Maintenance mode |
+
+---
+
+## Config path note
+
+| Deployment type | Config file location |
+|-----------------|----------------------|
+| Docker / VPS (recommended) | `/data/.openclaw/openclaw.json` |
+| Local / native install | `~/.openclaw/config.json5` |
+
+The `/data/.openclaw/` path is used when OpenClaw runs in a Docker container with a mounted volume. This is the standard Hostinger VPS deployment pattern.
 
 ---
 
 ## Troubleshooting
 
-### Bot not responding at all
+### Bot not responding after config change
 
-1. Check token is correct in `/etc/openclaw.env`
-2. Confirm `channels.telegram.enabled: true` in config
-3. Check Gateway is running: `openclaw gateway status`
-4. Check logs: `openclaw logs --tail 30`
+1. Check that `TELEGRAM_BOT_TOKEN` is set in the VPS environment: `printenv TELEGRAM_BOT_TOKEN`
+2. Confirm `enabled: true` in the channels section
+3. Verify the JSON is valid — invalid JSON silently breaks the config. Use: `python3 -m json.tool /data/.openclaw/openclaw.json`
+4. Check OpenClaw logs: `openclaw logs --tail 30`
 
 ### "Unauthorized" error in logs
 
-Token is wrong or expired. Generate a new token in BotFather:
-`/revoke` → choose your bot → copy new token → update `.env` and VPS env file → restart Gateway
+Token is wrong or expired. In BotFather: `/revoke` → choose your bot → get new token → update `TELEGRAM_BOT_TOKEN` in `/etc/openclaw.env` → the config auto-reloads.
 
-### Bot responds but wrong agent
+### Message sent but no reply
 
-Check `agentId` in the channel config. Confirm the agent ID exists in `agents.list`.
+Your user ID is not in `allowFrom`. Get the correct numeric ID via `getUpdates` (Step 2) and add it to the config. The config reloads automatically.
 
-### "This bot is restricted" message to users
+### Webhook conflict
 
-The bot's `dmPolicy` is set to `allowlist` and the user is not on it. Add their `@username` to the allowlist, update config, restart Gateway.
-
-### BotFather-verified: token is correct but still not working
-
-Telegram webhooks and long-polling can conflict. OpenClaw uses long-polling by default. If you previously set a webhook on the bot (e.g. via another service), clear it:
+OpenClaw uses long-polling. If another service previously set a webhook on this bot token, clear it:
 
 ```bash
 curl "https://api.telegram.org/bot{TOKEN}/deleteWebhook"
@@ -119,13 +170,14 @@ curl "https://api.telegram.org/bot{TOKEN}/deleteWebhook"
 
 ---
 
-## Sending notifications FROM n8n TO Telegram
+## Sending notifications from n8n to Telegram
 
-If you want n8n to send Telegram messages (not through OpenClaw):
+Two separate patterns:
+
+**n8n → Telegram directly** (for notifications, not conversations)
 - Use n8n's built-in Telegram node
-- This is separate from OpenClaw's Telegram channel
-- OpenClaw handles inbound conversations; n8n can handle outbound notifications
+- No OpenClaw involved
 
-If you want n8n to trigger OpenClaw which then delivers to Telegram:
-- See `docs/knowledge/n8n-integration.md`
-- Use `POST /hooks/agent` with `"deliver": true, "channel": "telegram", "to": "<chat_id>"`
+**n8n → OpenClaw → Telegram** (for AI-generated responses delivered to Telegram)
+- Use `POST /hooks/agent` with `"deliver": true, "channel": "telegram", "to": "<numeric_chat_id>"`
+- See `docs/knowledge/n8n-integration.md` for the full webhook contract
