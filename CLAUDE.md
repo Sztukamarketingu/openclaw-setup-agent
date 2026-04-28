@@ -147,6 +147,12 @@ Jeśli wybierzesz B: po discovery poproszę o N8N_BASE_URL i N8N_API_KEY do .env
 
 Jeśli wybierzesz tak: zanim zapiszę config, przeczytaj `docs/knowledge/telegram-voice-setup.md` w całości — tam są pułapki które potrafią ciche zepsuć działanie głosówki (najważniejsza: agent NIE może ręcznie wywoływać narzędzia `tts` — runtime sam syntezuje). Postępuj według kroków 1–4 z tego dokumentu."
 
+**Q11:** "Czy chcesz żeby agent miał dostęp do **Airtable** (czytanie i pisanie do bazy)? Typowy use case: baza klientów/kontaktów/zamówień, kalendarz wydarzeń, knowledge base z którą agent pracuje codziennie.
+- **Tak** — potrzebny Personal Access Token (`pat...`) z scopes `data.records:read`, `data.records:write`, `schema.bases:read`, ograniczony do JEDNEJ bazy. Plus URL bazy żeby wyciągnąć baseId.
+- **Nie** (pomijamy)
+
+Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/airtable-setup.md` w całości i postępuj według 9 kroków. Krytyczne pułapki: `docker compose restart` NIE czyta nowego `.env` (potrzeba `up -d`), config mcporter musi być w `/data/.mcporter/` (system location) a nie `/data/config/` (project, CWD-relative), nowe skille wymagają `/new` w sesji żeby się pojawiły agentowi."
+
 ### After all questions: summarize
 
 Present a structured summary:
@@ -392,6 +398,7 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/knowledge/hostinger-vps.md` | Hostinger API reference, SSH access, VPS management |
 | `docs/knowledge/telegram-setup.md` | Telegram bot creation, channel configuration, troubleshooting |
 | `docs/knowledge/telegram-voice-setup.md` | Voice replies (TTS) on Telegram — provider choice (ElevenLabs/OpenAI), full config, the "agent must NOT call tts tool manually" rule, gotchas that silently break `sendVoice` |
+| `docs/knowledge/airtable-setup.md` | Airtable CRUD via MCP (`mcporter` + `airtable-mcp-server`) — PAT scopes, schema inspection, env reload trap, system vs project mcporter config, session skill snapshot, 8 gotchas |
 | `docs/knowledge/n8n-integration.md` | n8n → OpenClaw webhook contract, POST /hooks/agent |
 | `docs/knowledge/nexos-integration.md` | Nexos gateway setup, cost control, model routing |
 | `docs/knowledge/security.md` | Token separation, SSH tunnels, secrets management |
