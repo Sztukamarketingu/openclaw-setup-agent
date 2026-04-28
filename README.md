@@ -72,6 +72,9 @@ Add to `.env` when ready:
 | Nexos gateway | `NEXOS_API_KEY`, `NEXOS_BASE_URL` | Cost control, multi-model routing |
 | OpenRouter | `OPENROUTER_API_KEY` | Access to Gemini, DeepSeek, GPT, and more |
 | Qdrant | `QDRANT_URL`, `QDRANT_API_KEY` | Semantic memory and RAG |
+| ElevenLabs TTS | `ELEVENLABS_API_KEY` + `voiceId` in config | Voice replies on Telegram (auto-synth from inbound voice notes) |
+| OpenAI TTS | reuses `OPENAI_API_KEY` | Cheaper alternative to ElevenLabs (alloy/echo/fable/onyx/nova/shimmer) |
+| Airtable | `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` | Native CRUD on a base — list, search, create, update records via MCP |
 
 ---
 
@@ -106,6 +109,8 @@ openclaw-setup-agent/
 │   │   ├── openclaw-config.md             # Config file structure and field reference
 │   │   ├── hostinger-vps.md               # Hostinger API, SSH access, env vars
 │   │   ├── telegram-setup.md              # Telegram bot setup, allowlist, Hostinger env
+│   │   ├── telegram-voice-setup.md        # Voice replies (TTS) — ElevenLabs/OpenAI, gotchas
+│   │   ├── airtable-setup.md              # Airtable CRUD via MCP (mcporter + airtable-mcp-server)
 │   │   ├── discord-setup.md               # Discord bot setup and channel routing
 │   │   ├── n8n-integration.md             # n8n → OpenClaw webhook contract
 │   │   ├── nexos-integration.md           # Nexos AI gateway setup
