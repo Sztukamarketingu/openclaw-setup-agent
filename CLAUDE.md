@@ -140,6 +140,13 @@ Jeśli wybierzesz B: po discovery poproszę o N8N_BASE_URL i N8N_API_KEY do .env
 - **Nexos gateway** (zalecany przy większym ruchu — routing do wielu modeli, kontrola kosztów; NEXOS_API_KEY + NEXOS_BASE_URL ustawimy w Hostinger Environment Variables)
 - **OpenRouter** (dostęp do wielu modeli: Gemini, DeepSeek, GPT; OPENROUTER_API_KEY ustawimy w Hostinger Environment Variables)"
 
+**Q10 (only if Telegram was chosen in Q2b):** "Czy chcesz żeby agent odpowiadał **głosem** kiedy ktoś wyśle do niego głosówkę na Telegramie? (TTS — text-to-speech)
+- **Tak, ElevenLabs** (zalecany — wysoka jakość, naturalny polski głos, można sklonować własny; potrzebny klucz ELEVENLABS_API_KEY i `voiceId`)
+- **Tak, OpenAI** (taniej, używa istniejącego OPENAI_API_KEY; głos: alloy/echo/fable/onyx/nova/shimmer)
+- **Nie, tylko tekst** (pomijamy)
+
+Jeśli wybierzesz tak: zanim zapiszę config, przeczytaj `docs/knowledge/telegram-voice-setup.md` w całości — tam są pułapki które potrafią ciche zepsuć działanie głosówki (najważniejsza: agent NIE może ręcznie wywoływać narzędzia `tts` — runtime sam syntezuje). Postępuj według kroków 1–4 z tego dokumentu."
+
 ### After all questions: summarize
 
 Present a structured summary:
@@ -384,6 +391,7 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/knowledge/openclaw-config.md` | Questions about config file structure, providers, agents |
 | `docs/knowledge/hostinger-vps.md` | Hostinger API reference, SSH access, VPS management |
 | `docs/knowledge/telegram-setup.md` | Telegram bot creation, channel configuration, troubleshooting |
+| `docs/knowledge/telegram-voice-setup.md` | Voice replies (TTS) on Telegram — provider choice (ElevenLabs/OpenAI), full config, the "agent must NOT call tts tool manually" rule, gotchas that silently break `sendVoice` |
 | `docs/knowledge/n8n-integration.md` | n8n → OpenClaw webhook contract, POST /hooks/agent |
 | `docs/knowledge/nexos-integration.md` | Nexos gateway setup, cost control, model routing |
 | `docs/knowledge/security.md` | Token separation, SSH tunnels, secrets management |
