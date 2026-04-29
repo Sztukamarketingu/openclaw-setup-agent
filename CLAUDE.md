@@ -158,7 +158,20 @@ Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/airtable-s
 - **Tak, wiele kont** — to samo co wyżej. Konta mogą być na tym samym lub różnych projektach Cloud Console — `gog` obsługuje multi-client przez flagę `--client <name>`.
 - **Nie** (pomijamy — możesz dalej dostawać maile pasywnie przez n8n hook bez gog)
 
-Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/google-workspace-setup.md` w całości i postępuj według 10 kroków. Krytyczne pułapki w kolejności bólu: (1) browser-based OAuth flow nie działa na VPS — używaj `--remote --step 1/2`; (2) `GOG_KEYRING_PASSWORD` MUSI być w `.env` przed pierwszą autoryzacją inaczej token się nie zapisze; (3) `/usr/local/bin/gog` NIE przeżywa `docker compose up -d` — kopia w `/data/.bin/gog` ratuje; (4) `tools.exec.security: 'allowlist'` z pustą listą = approve spam, ustaw `'full'` i bezpieczeństwo trzymaj w SOUL.md; (5) domyślne scopes obejmują WSZYSTKO (classroom, ads, chat) — ZAWSZE używaj `--services gmail,drive,calendar,docs,sheets`."
+Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/google-workspace-setup.md` w całości i postępuj według 10 kroków.
+
+**WAŻNE — sposób prowadzenia użytkownika przez ten setup:**
+- **Cały dokument jest po angielsku, ale TY rozmawiasz z użytkownikiem PO POLSKU.** Tłumacz każdy krok na język użytkownika — nie wklejaj angielskich akapitów. Komendy bash zostają po angielsku, ale opisy "po co", "co teraz" i "co zobaczysz" — po polsku.
+- **Cloud Console (Step 2)**: prowadź klik po kliku — "wejdź na console.cloud.google.com → przycisk u góry → New Project → wpisz nazwę X → kliknij Create". Nie zakładaj że użytkownik wie co znaczy "OAuth consent screen" — wytłumacz że to ekran który Google pokaże osobom logującym się.
+- **OAuth flow (Step 6) jest najtrudniejszy bo jest multi-turn:**
+  1. Wygenerujesz URL i wyślesz go użytkownikowi
+  2. Użytkownik otworzy go w przeglądarce, zaloguje się i zatwierdzi uprawnienia
+  3. **Przeglądarka pokaże błąd "Ta witryna jest nieosiągalna" / "site can't be reached" — UPRZEDŹ użytkownika ZANIM się to zdarzy**, że to jest dokładnie to czego oczekujemy, nie awaria. Powiedz: *"Po zatwierdzeniu zobaczysz w przeglądarce 'Ta witryna jest nieosiągalna' — to jest OK. Skopiuj wtedy CAŁY adres URL z paska przeglądarki i wklej mi go tutaj."*
+  4. Użytkownik wkleja URL → wykonujesz step 2 z `--auth-url '<url>'`
+- **Powtórz ten flow dla każdego konta osobno.** Nie próbuj autoryzować dwóch kont jednocześnie — zgubicie się oboje.
+- **Po każdym `docker compose up -d`** musisz przekopiować `gog` z `/data/.bin/gog` do `/usr/local/bin/gog` (sekcja 'After every recreate' w docu). Pamiętaj o tym automatycznie, nie czekaj aż użytkownik zauważy że gog zniknął.
+
+**Krytyczne pułapki w kolejności bólu:** (1) browser-based OAuth flow nie działa na VPS — używaj `--remote --step 1/2`; (2) `GOG_KEYRING_PASSWORD` MUSI być w `.env` przed pierwszą autoryzacją inaczej token się nie zapisze; (3) `/usr/local/bin/gog` NIE przeżywa `docker compose up -d` — kopia w `/data/.bin/gog` ratuje; (4) `tools.exec.security: 'allowlist'` z pustą listą = approve spam, ustaw `'full'` i bezpieczeństwo trzymaj w SOUL.md; (5) domyślne scopes obejmują WSZYSTKO (classroom, ads, chat) — ZAWSZE używaj `--services gmail,drive,calendar,docs,sheets`."
 
 ### After all questions: summarize
 
