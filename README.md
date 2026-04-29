@@ -75,6 +75,7 @@ Add to `.env` when ready:
 | ElevenLabs TTS | `ELEVENLABS_API_KEY` + `voiceId` in config | Voice replies on Telegram (auto-synth from inbound voice notes) |
 | OpenAI TTS | reuses `OPENAI_API_KEY` | Cheaper alternative to ElevenLabs (alloy/echo/fable/onyx/nova/shimmer) |
 | Airtable | `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID` | Native CRUD on a base — list, search, create, update records via MCP |
+| Google Workspace (gog) | `GOG_KEYRING_PASSWORD` + per-account OAuth tokens | Native Gmail / Drive / Calendar / Docs / Sheets — read inbox, send replies, search Drive for contracts, check calendar. Multi-account, multi-project supported. |
 
 ---
 
@@ -111,6 +112,7 @@ openclaw-setup-agent/
 │   │   ├── telegram-setup.md              # Telegram bot setup, allowlist, Hostinger env
 │   │   ├── telegram-voice-setup.md        # Voice replies (TTS) — ElevenLabs/OpenAI, gotchas
 │   │   ├── airtable-setup.md              # Airtable CRUD via MCP (mcporter + airtable-mcp-server)
+│   │   ├── google-workspace-setup.md      # Gmail/Drive/Calendar via gog skill — OAuth for headless servers, multi-account
 │   │   ├── discord-setup.md               # Discord bot setup and channel routing
 │   │   ├── n8n-integration.md             # n8n → OpenClaw webhook contract
 │   │   ├── nexos-integration.md           # Nexos AI gateway setup
