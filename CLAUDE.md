@@ -153,6 +153,13 @@ Jeśli wybierzesz tak: zanim zapiszę config, przeczytaj `docs/knowledge/telegra
 
 Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/airtable-setup.md` w całości i postępuj według 9 kroków. Krytyczne pułapki: `docker compose restart` NIE czyta nowego `.env` (potrzeba `up -d`), config mcporter musi być w `/data/.mcporter/` (system location) a nie `/data/config/` (project, CWD-relative), nowe skille wymagają `/new` w sesji żeby się pojawiły agentowi."
 
+**Q12:** "Czy chcesz żeby agent miał dostęp do **Google Workspace** (Gmail, Drive, Calendar, Docs, Sheets) — jednego lub wielu kont? Typowy use case: czytanie i wysyłka maili w imieniu zespołu, zarządzanie umowami na Drive, sprawdzanie kalendarza.
+- **Tak, jedno konto** — potrzebny dostęp do Google Cloud Console żeby utworzyć projekt + OAuth Client (Desktop app), pobrać `client_secret_*.json`. Skill `gog` (gogcli) jest bundled w OpenClaw.
+- **Tak, wiele kont** — to samo co wyżej. Konta mogą być na tym samym lub różnych projektach Cloud Console — `gog` obsługuje multi-client przez flagę `--client <name>`.
+- **Nie** (pomijamy — możesz dalej dostawać maile pasywnie przez n8n hook bez gog)
+
+Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/google-workspace-setup.md` w całości i postępuj według 10 kroków. Krytyczne pułapki w kolejności bólu: (1) browser-based OAuth flow nie działa na VPS — używaj `--remote --step 1/2`; (2) `GOG_KEYRING_PASSWORD` MUSI być w `.env` przed pierwszą autoryzacją inaczej token się nie zapisze; (3) `/usr/local/bin/gog` NIE przeżywa `docker compose up -d` — kopia w `/data/.bin/gog` ratuje; (4) `tools.exec.security: 'allowlist'` z pustą listą = approve spam, ustaw `'full'` i bezpieczeństwo trzymaj w SOUL.md; (5) domyślne scopes obejmują WSZYSTKO (classroom, ads, chat) — ZAWSZE używaj `--services gmail,drive,calendar,docs,sheets`."
+
 ### After all questions: summarize
 
 Present a structured summary:
@@ -166,6 +173,9 @@ Restrictions: [list]
 Agent name & tone: [name + tone]
 n8n integration: [nie / tylko hooki OpenClaw / hooki + workflow w n8n]
 Browser automation: [yes / no — which systems]
+Voice replies (TTS): [no / OpenAI / ElevenLabs]
+Airtable: [no / yes — base name]
+Google Workspace: [no / yes — N accounts, single project / multi project]
 Model provider: [choice]
 ```
 
@@ -399,6 +409,7 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/knowledge/telegram-setup.md` | Telegram bot creation, channel configuration, troubleshooting |
 | `docs/knowledge/telegram-voice-setup.md` | Voice replies (TTS) on Telegram — provider choice (ElevenLabs/OpenAI), full config, the "agent must NOT call tts tool manually" rule, gotchas that silently break `sendVoice` |
 | `docs/knowledge/airtable-setup.md` | Airtable CRUD via MCP (`mcporter` + `airtable-mcp-server`) — PAT scopes, schema inspection, env reload trap, system vs project mcporter config, session skill snapshot, 8 gotchas |
+| `docs/knowledge/google-workspace-setup.md` | Gmail / Drive / Calendar / Docs / Sheets via the bundled `gog` skill (gogcli) — OAuth setup for headless servers (`--remote --step 1/2`), multi-account / multi-project (`--client` flag), keyring password timing trap, binary persistence across `docker compose up -d`, scope minimization with `--services`, the `tools.exec.security: "full"` decision, 9 gotchas |
 | `docs/knowledge/n8n-integration.md` | n8n → OpenClaw webhook contract, POST /hooks/agent |
 | `docs/knowledge/nexos-integration.md` | Nexos gateway setup, cost control, model routing |
 | `docs/knowledge/security.md` | Token separation, SSH tunnels, secrets management |
