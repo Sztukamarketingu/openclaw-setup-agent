@@ -313,6 +313,26 @@ If unsure of a flag, run `gog <area> --help` (e.g. `gog gmail --help`).
 - **If unclear:** ask explicitly before action — "Send from your inbox or from <Name 2>'s?"
 - **For new outbound (not replies):** ask the user which account to use as sender.
 
+### Sending email with signatures (CRITICAL — known gog bug)
+
+`gog gmail send --signature-file <html>` is **broken** (v0.14.0) — it HTML-escapes the signature, recipients see raw `&lt;br&gt;` etc. Always concatenate the signature manually into `--body-html`:
+
+```bash
+# From the agent's shell — body + signature joined inline
+gog -a <email> --client <client> gmail send \
+  --to "recipient@x" \
+  --subject "..." \
+  --body-html "$(echo '<p>Treść maila w HTML</p><p>Pozdrawiam,<br>Imie</p>'; cat /data/.openclaw/workspace/signatures/<name>.html)"
+```
+
+Rules:
+- **Always `--body-html`** (not `--body`). The signature is HTML and the message must be HTML.
+- **Match signature file to the sending account** (`-a`).
+- **Never** use `--signature-file`. The flag is broken; the docs are wrong on this one.
+- Body content you write yourself in HTML — `<p>` for paragraphs, `<br>` for line breaks, `<strong>` for bold.
+
+If the user says "send without signature" — drop the `cat <signature.html>` part; it's an exception, not the norm.
+
 ### Write rules (CRITICAL)
 
 Every action that changes state in Google Workspace requires **explicit human approval**:
@@ -385,6 +405,23 @@ A more robust fix is to bake `gog` into a custom image, or add a `command:` star
 8. **Internal vs External consent screen.** If the user is on Google Workspace (custom domain), pick **Internal** — no app verification needed, all Workspace users can authorize. External requires test users until you submit for verification. Always check what they're on before suggesting Internal.
 
 9. **OpenClaw CLI commands `approve`, `exec` may be unavailable.** Some bundled CLI surfaces are excluded by `plugins.allow`. The runtime/agent works regardless — these are only the operator's CLI tools. Don't panic when `openclaw exec --help` errors with "command unavailable" — `tools.exec` still functions for the agent.
+
+10. **`gog gmail send --signature-file` HTML escapes the signature** (gog v0.14.0). Despite the docs saying "plain text or HTML", an HTML signature file is sent as escaped text — recipients see `&lt;br&gt;`, `&lt;div ...&gt;` etc. as literal characters in their email. Workaround: skip `--signature-file` and concatenate the signature directly into `--body-html` via shell:
+
+    ```bash
+    docker exec <container> bash -c "gog -a <email> --client <client> gmail send \
+      --to 'recipient@x' \
+      --subject '...' \
+      --body-html \"\$(echo '<p>Treść w HTML</p>'; cat /data/.openclaw/workspace/signatures/<name>.html)\""
+    ```
+
+    Tell the agent in SOUL.md to **always** concat instead of using the broken flag — otherwise it'll try the documented path first and produce malformed emails. Burned ~15 min before we caught what was happening (we thought MIME multipart was wrong; it was actually HTML escaping).
+
+11. **Telegram forum topics: hook payload `threadId` is NOT routed to message_thread_id when `deliver: true`.** OpenClaw's hook delivery path drops the `threadId` field — only the native send tool (used by the agent itself) honors `messageThreadId`. If you need topic-per-conversation routing, do not try to push it from n8n via hook; instead give the agent `chat_id` + topic management instructions in SOUL.md and let the agent decide and call the Telegram API directly (`createForumTopic`, `sendMessage` with `message_thread_id`, `closeForumTopic`). Bot needs `can_manage_topics` permission **explicitly granted** on top of admin role — making it admin alone is not enough.
+
+12. **Workspace files created via `docker exec` (without `-u node`) are owned by root.** The agent runs as `node` (UID 1000) and can't write to root-owned files. After creating any file the agent should write to (e.g. `topic_mappings.json`, signature files, custom config), `chown node:node <path>` inside the container. Otherwise the agent silently keeps state "in memory only" — and you only find out when the next session forgets everything.
+
+13. **`agents.defaults.model.primary` must be a model ID (e.g. `anthropic/claude-sonnet-4-6`), not an alias (e.g. `Claude Sonnet 4.6`).** If you set an alias, runtime defaults the provider to `openai/<alias>` → `FailoverError: Unknown model: openai/Claude Sonnet 4.6`. Hooks accept (HTTP 200) but the agent silently fails to generate any response. The `/model <Alias>` slash command in chat changes the alias for that session, but the persistent `primary` in config must be a full ID.
 
 ---
 
