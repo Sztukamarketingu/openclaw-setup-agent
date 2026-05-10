@@ -197,6 +197,12 @@ Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/google-wor
 
 **Krytyczne pułapki w kolejności bólu:** (1) browser-based OAuth flow nie działa na VPS — używaj `--remote --step 1/2`; (2) `GOG_KEYRING_PASSWORD` MUSI być w `.env` przed pierwszą autoryzacją inaczej token się nie zapisze; (3) `/usr/local/bin/gog` NIE przeżywa `docker compose up -d` — kopia w `/data/.bin/gog` ratuje; (4) `tools.exec.security: 'allowlist'` z pustą listą = approve spam, ustaw `'full'` i bezpieczeństwo trzymaj w SOUL.md; (5) domyślne scopes obejmują WSZYSTKO (classroom, ads, chat) — ZAWSZE używaj `--services gmail,drive,calendar,docs,sheets`."
 
+**Q13:** "Czy chcesz żeby agent miał dostęp do **ClickUp** jako managera zadań? Typowy use case: tworzenie taska dla każdego nowego zapytania/leada, aktualizacja statusu pipeline (nowe → oferta wysłana → kontrakt), poranne przypomnienia z tasków z przeterminowanym due_date, podzadania do śledzenia osobnych wątków (np. zapytanie do managera artysty).
+- **Tak** — potrzebny Personal API Token (zakładka Apps w profilu ClickUp). Zbierzemy też: list_id (lista gdzie trafiają taski), team_id, user_id-y do przypisywania, dokładne nazwy statusów, ID custom pól.
+- **Nie** (pomijamy)
+
+Jeśli wybierzesz tak: przed konfiguracją przeczytaj `docs/knowledge/clickup-setup.md` w całości i postępuj według 6 kroków. Krytyczne pułapki: `due_date` musi być w **milisekundach** nie sekundach (cichy błąd — task dostaje datę 1970), nazwy statusów muszą być **identyczne** ze stringami w ClickUp (łącznie z polskimi znakami i spacjami — API zwraca 200 nawet gdy status się nie zmienił), custom pola wymagają **osobnego PUT call** po stworzeniu taska (nie można ustawić w POST)."
+
 ---
 
 ## Phase 2.5: Multi-agent design
@@ -342,6 +348,7 @@ Browser automation: [yes / no — which systems]
 Voice replies (TTS): [no / OpenAI / ElevenLabs]
 Airtable: [no / yes — base name]
 Google Workspace: [no / yes — N accounts, single project / multi project]
+ClickUp: [no / yes — list name, pipeline stages]
 Model provider: [choice]
 ```
 
@@ -419,6 +426,9 @@ OPENCLAW_HOOKS_TOKEN=<value from your .env>
 # Optional — n8n integration
 N8N_BASE_URL=<value from your .env>
 N8N_API_KEY=<value from your .env>
+
+# Optional — ClickUp task management
+CLICKUP_API_TOKEN=<value from your .env>
 ```
 
 Only include variables that are actually needed based on the configuration designed.
@@ -597,6 +607,7 @@ Always consult these documents when the user asks related questions or when you 
 | `docs/knowledge/tailscale-setup.md` | Tailscale VPN for secure UI access and SSH, Serve vs Funnel |
 | `docs/knowledge/multi-agent.md` | Multi-agent architecture: when to split, orchestrator/intake/specialist/execution patterns, inter-agent hook format, relay_message convention, shared state ownership, adding a new agent step-by-step, common mistakes (hooks-proxy orphan, billing cache, PENDING_PIPELINE), business profiles |
 | `docs/knowledge/skills.md` | Skills system: skill anatomy (frontmatter + steps + report-to-main), when to create a skill vs keep in SOUL.md, directory structure, installing on VPS (exec cat pattern, ownership), writing reliable bash steps, testing with manual hooks, common mistakes |
+| `docs/knowledge/clickup-setup.md` | ClickUp task pipeline via REST API v2 — token setup, collecting list/team/user/status/custom-field IDs, task creation, status update, custom field PUT, subtasks, due_date in ms, overdue task listing for briefings, 9 gotchas (ms not s, exact status strings, custom fields as separate calls) |
 | `docs/knowledge/qdrant-rag.md` | Qdrant install, collections, indexing via n8n, RAG queries |
 | `docs/knowledge/docker-troubleshooting.md` | Container logs, config validation, env vars, OOM, disk |
 | `docs/profiles/consulting.md` | Consulting, freelance, advisory — proposals and client comms |
